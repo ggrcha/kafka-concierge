@@ -6,10 +6,10 @@ import (
 	"time"
 )
 
+const letterBytes = "abcdefABCDEF"
+
 // StreamPendingRequests keeps all requests pending response
 var StreamPendingRequests map[string]chan bool
-
-const letterBytes = "abcdefABCDEF"
 
 // ConsumeKafkaResponses ...
 func ConsumeKafkaResponses() {
@@ -24,9 +24,8 @@ func ConsumeKafkaResponses() {
 		rChan, exists := StreamPendingRequests[requestID]
 		log.Println("exists? ", exists)
 		if exists {
-			log.Println("returning to send response to client")
+			log.Println("returning to client")
 			rChan <- true
-			delete(StreamPendingRequests, requestID)
 		}
 		log.Println(StreamPendingRequests)
 	}

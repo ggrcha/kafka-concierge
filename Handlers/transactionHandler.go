@@ -22,17 +22,22 @@ func StreamHandler(next http.HandlerFunc) http.HandlerFunc {
 
 		requestID := letterBytes[rand.Intn(len(letterBytes))]
 		responseChan := make(chan bool)
+		defer closeResources(string(requestID), responseChan)
 
-		go pending.ManagePendingRequest(string(requestID), responseChan)
+		go pending.AddPendingRequest(string(requestID), responseChan)
 
 		select {
-		case <-time.After(40 * time.Second):
+		case <-time.After(1 * time.Second):
 			log.Println("timeout received")
 		case <-responseChan:
 			log.Println("received response from kafka consumer")
 		}
-
 		log.Printf("returning ...")
-
 	}
+}
+
+func closeResources(requestID string, responseChan chan bool) {
+	pending.RemovePendingRequest(requestID)
+	time.Sleep(10 * time.Second)
+	close(responseChan)
 }
