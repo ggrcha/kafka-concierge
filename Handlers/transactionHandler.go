@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const letterBytes = "abcdefABCDEF"
 
 // StreamHandler wraps requests for new transactions
 func StreamHandler(next http.HandlerFunc) http.HandlerFunc {
@@ -25,11 +25,11 @@ func StreamHandler(next http.HandlerFunc) http.HandlerFunc {
 
 		go pending.ManagePendingRequest(string(requestID), responseChan)
 
-		log.Println(pending.StreamPendingRequests)
-
 		select {
-		case <-time.After(1 * time.Second):
+		case <-time.After(40 * time.Second):
 			log.Println("timeout received")
+		case <-responseChan:
+			log.Println("received response from kafka consumer")
 		}
 
 		log.Printf("returning ...")
