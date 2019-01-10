@@ -19,10 +19,6 @@ const letterBytes = "ab"
 // ConsumeKafkaResponses ...
 func ConsumeKafkaResponses() {
 
-	// creates the pending requests map and injects it on the pending request routine
-	streamPendingRequests := make(map[string]chan string)
-	pending.SetStreamPendingRequests(streamPendingRequests)
-
 	// starts channel to receive timeouts
 	ToChan = make(chan string)
 	NewRequest = make(chan pending.Request)

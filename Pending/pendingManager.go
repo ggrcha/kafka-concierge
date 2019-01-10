@@ -16,6 +16,12 @@ type Request struct {
 
 // Add manages the struct containing pending requests
 func (pr Request) Add() {
+
+	// if no map avaiable, creates one
+	if streamPendingRequests == nil {
+		setStreamPendingRequests(make(map[string]chan string))
+	}
+
 	streamPendingRequests[pr.RequestID] = pr.ResponseChan
 	log.Println(debuggin.Tracer(), "NewRequest: ", streamPendingRequests)
 }
@@ -33,6 +39,6 @@ func (pr Request) GetByID() (chan string, bool) {
 }
 
 // SetStreamPendingRequests ...
-func SetStreamPendingRequests(spr map[string]chan string) {
+func setStreamPendingRequests(spr map[string]chan string) {
 	streamPendingRequests = spr
 }
