@@ -1,16 +1,35 @@
 package pending
 
+import "log"
+
 // StreamPendingRequests keeps all requests pending response
-var StreamPendingRequests map[string]chan bool
+var streamPendingRequests map[string]chan string
 
-// AddPendingRequest manages the struct containing pending requests
-func AddPendingRequest(requestID string, responseChan chan bool) {
-
-	StreamPendingRequests[requestID] = responseChan
-
+// Request ...
+type Request struct {
+	RequestID    string
+	ResponseChan chan string
 }
 
-// RemovePendingRequest ...
-func RemovePendingRequest(requestID string) {
-	delete(StreamPendingRequests, requestID)
+// Add manages the struct containing pending requests
+func (pr Request) Add() {
+	streamPendingRequests[pr.RequestID] = pr.ResponseChan
+	log.Println("NewRequest: ", streamPendingRequests)
+}
+
+// Remove ...
+func (pr Request) Remove() {
+	delete(streamPendingRequests, pr.RequestID)
+	log.Println("ToChan: ", streamPendingRequests)
+}
+
+// GetByID ...
+func (pr Request) GetByID() (chan string, bool) {
+	r, exists := streamPendingRequests[pr.RequestID]
+	return r, exists
+}
+
+// SetStreamPendingRequests ...
+func SetStreamPendingRequests(spr map[string]chan string) {
+	streamPendingRequests = spr
 }

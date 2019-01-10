@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	kafka "kernel-concierge/Kafka"
 	pending "kernel-concierge/Pending"
 	"log"
 	"math/rand"
@@ -8,7 +9,7 @@ import (
 	"time"
 )
 
-const letterBytes = "abcdefABCDEF"
+const letterBytes = "ab"
 
 // StreamHandler wraps requests for new transactions
 func StreamHandler(next http.HandlerFunc) http.HandlerFunc {
@@ -18,26 +19,26 @@ func StreamHandler(next http.HandlerFunc) http.HandlerFunc {
 
 		log.Printf("Logged connection from %s", r.RemoteAddr)
 
+		pr := pending.Request{}
+		pr.RequestID = string(letterBytes[rand.Intn(len(letterBytes))])
+		pr.ResponseChan = make(chan string)
+		defer closeResources(pr)
+
 		go next.ServeHTTP(w, r)
 
-		requestID := letterBytes[rand.Intn(len(letterBytes))]
-		responseChan := make(chan bool)
-		defer closeResources(string(requestID), responseChan)
-
-		go pending.AddPendingRequest(string(requestID), responseChan)
+		kafka.NewRequest <- pr
 
 		select {
-		case <-time.After(1 * time.Second):
+		case <-time.After(3 * time.Second):
 			log.Println("timeout received")
-		case <-responseChan:
+			kafka.ToChan <- pr.RequestID
+		case <-pr.ResponseChan:
 			log.Println("received response from kafka consumer")
 		}
 		log.Printf("returning ...")
 	}
 }
 
-func closeResources(requestID string, responseChan chan bool) {
-	pending.RemovePendingRequest(requestID)
-	time.Sleep(10 * time.Second)
-	close(responseChan)
+func closeResources(pr pending.Request) {
+	close(pr.ResponseChan)
 }
