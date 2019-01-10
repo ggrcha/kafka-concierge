@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	debuggin "kernel-concierge/Debuggin"
 	kafka "kernel-concierge/Kafka"
 	pending "kernel-concierge/Pending"
 	"log"
@@ -17,7 +18,7 @@ func StreamHandler(next http.HandlerFunc) http.HandlerFunc {
 
 		rand.Seed(time.Now().UnixNano())
 
-		log.Printf("Logged connection from %s", r.RemoteAddr)
+		log.Println(debuggin.Tracer(), "Logged connection from: ", r.RemoteAddr)
 
 		pr := pending.Request{}
 		pr.RequestID = string(letterBytes[rand.Intn(len(letterBytes))])
@@ -30,12 +31,14 @@ func StreamHandler(next http.HandlerFunc) http.HandlerFunc {
 
 		select {
 		case <-time.After(3 * time.Second):
-			log.Println("timeout received")
+			log.Println(debuggin.Tracer(), "timeout received")
 			kafka.ToChan <- pr.RequestID
 		case <-pr.ResponseChan:
-			log.Println("received response from kafka consumer")
+			log.Println(debuggin.Tracer(), "received response from kafka consumer")
 		}
-		log.Printf("returning ...")
+		log.Println(debuggin.Tracer(), "returning ...")
+
+		w.Write([]byte("ok"))
 	}
 }
 

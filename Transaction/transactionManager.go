@@ -1,11 +1,12 @@
 package transaction
 
 import (
-	"fmt"
+	debuggin "kernel-concierge/Debuggin"
+	"log"
 	"net/http"
 )
 
 // Manager starts the process of a new transaction
 func Manager(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("postei a mensagem no kafka")
+	log.Println(debuggin.Tracer(), "postei a mensagem no kafka")
 }

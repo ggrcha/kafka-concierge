@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	debuggin "kernel-concierge/Debuggin"
 	pending "kernel-concierge/Pending"
 	"log"
 	"math/rand"
@@ -30,14 +31,14 @@ func ConsumeKafkaResponses() {
 
 	for {
 
-		log.Println("awake")
+		log.Println(debuggin.Tracer(), "awake")
 
 		select {
 		case id := <-ToChan:
 			pr := pending.Request{RequestID: id}
 			pr.Remove()
 		case nr := <-NewRequest:
-			log.Println("new request arrived: ", nr)
+			log.Println(debuggin.Tracer(), "new request arrived: ", nr)
 			nr.Add()
 		}
 
@@ -45,6 +46,7 @@ func ConsumeKafkaResponses() {
 		rp := pending.Request{RequestID: requestID}
 		c, exists := rp.GetByID()
 		if exists {
+			rp.Remove()
 			c <- "response received"
 		}
 	}

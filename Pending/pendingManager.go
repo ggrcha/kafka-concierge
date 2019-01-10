@@ -1,6 +1,9 @@
 package pending
 
-import "log"
+import (
+	debuggin "kernel-concierge/Debuggin"
+	"log"
+)
 
 // StreamPendingRequests keeps all requests pending response
 var streamPendingRequests map[string]chan string
@@ -14,13 +17,13 @@ type Request struct {
 // Add manages the struct containing pending requests
 func (pr Request) Add() {
 	streamPendingRequests[pr.RequestID] = pr.ResponseChan
-	log.Println("NewRequest: ", streamPendingRequests)
+	log.Println(debuggin.Tracer(), "NewRequest: ", streamPendingRequests)
 }
 
 // Remove ...
 func (pr Request) Remove() {
 	delete(streamPendingRequests, pr.RequestID)
-	log.Println("ToChan: ", streamPendingRequests)
+	log.Println(debuggin.Tracer(), "ToChan: ", streamPendingRequests)
 }
 
 // GetByID ...
