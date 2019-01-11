@@ -12,6 +12,7 @@ var streamPendingRequests map[string]chan string
 type Request struct {
 	RequestID    string
 	ResponseChan chan string
+	RequestData  string
 }
 
 // Add manages the struct containing pending requests

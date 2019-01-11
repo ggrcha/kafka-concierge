@@ -9,7 +9,7 @@ import (
 )
 
 // ToChan timeout channel
-var ToChan chan string
+var ToChan chan pending.Request
 
 // NewRequest new request channel
 var NewRequest chan pending.Request
@@ -20,7 +20,7 @@ const letterBytes = "ab"
 func ConsumeKafkaResponses() {
 
 	// starts channel to receive timeouts
-	ToChan = make(chan string)
+	ToChan = make(chan pending.Request)
 	NewRequest = make(chan pending.Request)
 
 	rand.Seed(time.Now().UnixNano())
@@ -31,8 +31,7 @@ func ConsumeKafkaResponses() {
 
 		// blocks execution until some timeout or arrival of new request
 		select {
-		case id := <-ToChan:
-			pr := pending.Request{RequestID: id}
+		case pr := <-ToChan:
 			pr.Remove()
 		case nr := <-NewRequest:
 			log.Println(debuggin.Tracer(), "new request arrived: ", nr)
