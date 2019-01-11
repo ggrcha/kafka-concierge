@@ -9,6 +9,7 @@ import (
 
 func main() {
 
+	// starts routine that gets kafka's responses
 	go kafka.ConsumeKafkaResponses()
 
 	http.Handle("/log", handlers.StreamHandler(tran.Manager))

@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-// ToChan ...
+// ToChan timeout channel
 var ToChan chan string
 
-// NewRequest ...
+// NewRequest new request channel
 var NewRequest chan pending.Request
 
 const letterBytes = "ab"
@@ -29,6 +29,7 @@ func ConsumeKafkaResponses() {
 
 		log.Println(debuggin.Tracer(), "awake")
 
+		// blocks execution until some timeout or arrival of new request
 		select {
 		case id := <-ToChan:
 			pr := pending.Request{RequestID: id}
@@ -38,8 +39,10 @@ func ConsumeKafkaResponses() {
 			nr.Add()
 		}
 
+		// receives new response from kafka
 		requestID := string(letterBytes[rand.Intn(len(letterBytes))])
 		rp := pending.Request{RequestID: requestID}
+		// gets response channel to send response
 		c, exists := rp.GetByID()
 		if exists {
 			rp.Remove()
