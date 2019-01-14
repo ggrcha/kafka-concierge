@@ -6,29 +6,13 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"os/signal"
 	"time"
 )
-
-var signals chan os.Signal
-
-// ToChan timeout channel
-var ToChan chan pending.Request
-
-// NewRequest new request channel
-var NewRequest chan pending.Request
 
 const letterBytes = "ab"
 
 // ConsumeKafkaResponses ...
 func ConsumeKafkaResponses() {
-
-	// starts channel to receive timeouts
-	ToChan = make(chan pending.Request)
-	NewRequest = make(chan pending.Request)
-	// Trap SIGINT to trigger a shutdown.
-	signals = make(chan os.Signal, 1)
-	signal.Notify(signals, os.Interrupt)
 
 	cg := getConsumer()
 
@@ -47,8 +31,8 @@ func ConsumeKafkaResponses() {
 		case nr := <-NewRequest:
 			log.Println(debuggin.Tracer(), "new request arrived: ", nr)
 			nr.Add()
-		case <-signals:
-			log.Println(debuggin.Tracer(), "exiting gracefully...")
+		case <-Cancel:
+			log.Println(debuggin.Tracer(), "kafka exiting")
 			closeResources()
 			os.Exit(0)
 		}

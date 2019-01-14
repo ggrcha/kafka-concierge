@@ -3,27 +3,10 @@ package kafka
 import (
 	debuggin "kernel-concierge/Debuggin"
 	"log"
-	"sync"
 	"time"
 
 	"github.com/wvanbergen/kafka/consumergroup"
 	"gopkg.in/Shopify/sarama.v1"
-)
-
-var (
-	kafkaProducer sarama.SyncProducer
-	onceP         sync.Once
-	onceCg        sync.Once
-	err           error
-	cg            *consumergroup.ConsumerGroup
-)
-
-const (
-	zookeeperConn = "127.0.0.1:2181"
-	cgroup        = "kernel-concierge"
-	reqTopic      = "kernel-concierge-rq"
-	rpTopic       = "kernel-concierge-rp"
-	broker        = "127.0.0.1:9092"
 )
 
 func getProducer() sarama.SyncProducer {
