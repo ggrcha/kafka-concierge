@@ -29,7 +29,7 @@ func getConsumer() *consumergroup.ConsumerGroup {
 		config.Offsets.ProcessingTimeout = 10 * time.Second
 
 		// join to consumer group
-		cg, _ = consumergroup.JoinConsumerGroup(cgroup, []string{rpTopic}, []string{zookeeperConn}, config)
+		cg, err = consumergroup.JoinConsumerGroup(cgroup, []string{rpTopic}, []string{zookeeperConn}, config)
 		if err != nil {
 			panic(err)
 		}

@@ -23,9 +23,9 @@ var (
 )
 
 const (
-	zookeeperConn = "127.0.0.1:2181"
+	zookeeperConn = "localhost:2181"
 	cgroup        = "kernel-concierge"
 	reqTopic      = "kernel-concierge-rq"
 	rpTopic       = "kernel-concierge-rp"
-	broker        = "127.0.0.1:9092"
+	broker        = "localhost:9092"
 )
