@@ -23,9 +23,6 @@ func main() {
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt)
 
-	// starts routine that gets kafka's responses
-	go kafka.ConsumeKafkaResponses()
-
 	go func() {
 		select {
 		case <-signals:
@@ -35,6 +32,9 @@ func main() {
 			closeResources()
 		}
 	}()
+
+	// starts routine that gets kafka's responses
+	go kafka.ConsumeKafkaResponses()
 
 	http.Handle("/log", handlers.StreamHandler(tran.Manager))
 	http.ListenAndServe(":8000", nil)
