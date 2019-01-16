@@ -1,10 +1,5 @@
 package pending
 
-import (
-	debuggin "kernel-concierge/Debuggin"
-	"log"
-)
-
 // StreamPendingRequests keeps all requests pending response
 var streamPendingRequests map[string]chan string
 
@@ -24,13 +19,11 @@ func (pr Request) Add() {
 	}
 
 	streamPendingRequests[pr.RequestID] = pr.ResponseChan
-	log.Println(debuggin.Tracer(), "NewRequest: ", streamPendingRequests)
 }
 
 // Remove ...
 func (pr Request) Remove() {
 	delete(streamPendingRequests, pr.RequestID)
-	log.Println(debuggin.Tracer(), "ToChan: ", streamPendingRequests)
 }
 
 // GetByID ...

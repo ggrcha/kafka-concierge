@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"encoding/json"
 	debuggin "kernel-concierge/Debuggin"
 	pending "kernel-concierge/Pending"
 	"log"
@@ -8,8 +9,6 @@ import (
 	"os"
 	"time"
 )
-
-const letterBytes = "ab"
 
 // ConsumeKafkaResponses ...
 func ConsumeKafkaResponses() {
@@ -26,8 +25,22 @@ func ConsumeKafkaResponses() {
 		select {
 		case msg := <-cg.Messages():
 			log.Println(debuggin.Tracer(), "received message: ", string(msg.Value))
+			var rv map[string]interface{}
+			if err := json.Unmarshal(msg.Value, &rv); err != nil {
+				panic(err)
+			}
+			requestID := rv["idRequest"].(string)
+			rp := pending.Request{RequestID: requestID}
+			// gets response channel to send response
+			rc, exists := rp.GetByID()
+			if exists {
+				rp.Remove()
+				rc <- string(msg.Value)
+				close(rc)
+			}
 		case pr := <-ToChan:
 			pr.Remove()
+			close(pr.ResponseChan)
 		case nr := <-NewRequest:
 			log.Println(debuggin.Tracer(), "new request arrived: ", nr)
 			nr.Add()
@@ -35,16 +48,6 @@ func ConsumeKafkaResponses() {
 			log.Println(debuggin.Tracer(), "kafka exiting")
 			closeResources()
 			os.Exit(0)
-		}
-
-		// receives new response from kafka
-		requestID := string(letterBytes[rand.Intn(len(letterBytes))])
-		rp := pending.Request{RequestID: requestID}
-		// gets response channel to send response
-		c, exists := rp.GetByID()
-		if exists {
-			rp.Remove()
-			c <- "response received"
 		}
 	}
 }

@@ -30,6 +30,13 @@ type RequestData struct {
 	} `json:"accounts"`
 }
 
+// ResponseData ...
+type ResponseData struct {
+	ResponseStatus string `json:"status"`
+	IDTransaction  string `json:"idTransaction"`
+	ResponseTopic  string `json:"responseTopic"`
+}
+
 var rm ResponseMessage
 
 // Manager manages request to kafka
@@ -39,13 +46,15 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 	rm = ResponseMessage{}
 
 	// rest boilerplate
-	rd := RequestData{}
 	req, _ := ioutil.ReadAll(r.Body)
 
+	// creates request that will be send to kafka pipeline
+	rd := RequestData{}
 	_ = json.Unmarshal(req, &rd.Accounts)
 	rd.IDRequest = uuid.Must(uuid.NewV4()).String()
 	rd.JaggerParams = ""
 
+	// converts to json
 	jsonRequest, _ := json.Marshal(rd)
 
 	// creates pending request to add do the stream pending map
@@ -53,12 +62,11 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 	pr.RequestID = rd.IDRequest
 	pr.ResponseChan = make(chan string)
 	pr.RequestData = string(jsonRequest)
-	// defers closing the channel and any other resource opened
-	defer closeResources(pr)
 
 	// adds newly created request to control map
 	kafka.NewRequest <- pr
 
+	// produces message to kafka pipeline
 	kafka.ProduceRequest(pr)
 
 	// blocks execution until response or timeout
@@ -67,17 +75,11 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 		log.Println(debuggin.Tracer(), "timeout received")
 		// Notifies timeout
 		kafka.ToChan <- pr
-	case <-pr.ResponseChan:
+	case rp := <-pr.ResponseChan:
 		// returns response to client
 		log.Println(debuggin.Tracer(), "received response from kafka consumer")
-		rm.Msg = "success"
-		w.WriteHeader(http.StatusBadRequest)
-		resp, _ := json.Marshal(rm)
+		w.WriteHeader(http.StatusOK)
+		resp, _ := json.Marshal(rp)
 		w.Write(resp)
-		log.Println(debuggin.Tracer(), "postei a mensagem no kafka")
 	}
-}
-
-func closeResources(pr pending.Request) {
-	close(pr.ResponseChan)
 }
