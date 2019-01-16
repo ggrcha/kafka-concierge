@@ -11,6 +11,11 @@ import (
 func StreamHandler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		if r.Method != "POST" {
+			http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+			return
+		}
+
 		log.Println(debuggin.Tracer(), "Logged connection from: ", r.RemoteAddr)
 		log.Println(debuggin.Tracer(), "starting at: ", time.Now())
 

@@ -13,11 +13,6 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-// ResponseMessage ...
-type ResponseMessage struct {
-	Msg string `json:"message"`
-}
-
 // RequestData ...
 type RequestData struct {
 	IDRequest    string `json:"idRequest"`
@@ -37,13 +32,10 @@ type ResponseData struct {
 	ResponseTopic  string `json:"responseTopic"`
 }
 
-var rm ResponseMessage
-
 // Manager manages request to kafka
 func Manager(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
-	rm = ResponseMessage{}
 
 	// rest boilerplate
 	req, _ := ioutil.ReadAll(r.Body)
@@ -75,6 +67,13 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 		log.Println(debuggin.Tracer(), "timeout received")
 		// Notifies timeout
 		kafka.ToChan <- pr
+		rd := ResponseData{}
+		rd.IDTransaction = pr.RequestID
+		rd.ResponseStatus = "INTERNAL_ERROR"
+		rd.ResponseTopic = ""
+		resp, _ := json.Marshal(rd)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(resp)
 	case rp := <-pr.ResponseChan:
 		// returns response to client
 		log.Println(debuggin.Tracer(), "received response from kafka consumer")
