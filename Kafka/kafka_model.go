@@ -2,6 +2,7 @@ package kafka
 
 import (
 	pending "kernel-concierge/Pending"
+	"os"
 	"sync"
 
 	"github.com/wvanbergen/kafka/consumergroup"
@@ -19,13 +20,13 @@ var (
 	// NewRequest new request channel
 	NewRequest chan pending.Request
 	// Cancel ends
-	Cancel chan bool
+	Cancel        chan bool
+	zookeeperConn = os.Getenv("ZK_HOST")
+	broker        = os.Getenv("KAFKA_HOST")
+	reqTopic      = os.Getenv("RQ_TOPIC")
+	rpTopic       = os.Getenv("RP_TOPIC")
 )
 
 const (
-	zookeeperConn = "localhost:2181"
-	cgroup        = "kernel-concierge"
-	reqTopic      = "kernel-concierge-rq"
-	rpTopic       = "kernel-concierge-rp"
-	broker        = "localhost:9092"
+	cgroup = "kernel-concierge"
 )

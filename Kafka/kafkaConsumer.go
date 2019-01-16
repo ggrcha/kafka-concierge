@@ -25,6 +25,7 @@ func ConsumeKafkaResponses() {
 		select {
 		case msg := <-cg.Messages():
 			log.Println(debuggin.Tracer(), "received message: ", string(msg.Value))
+			// retrieves idRequest from kafka response
 			var rv map[string]interface{}
 			if err := json.Unmarshal(msg.Value, &rv); err != nil {
 				panic(err)
