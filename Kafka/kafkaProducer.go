@@ -25,11 +25,11 @@ func ProduceRequest(request pending.Request) {
 
 }
 
-func prepareMessage(topic, message string) *sarama.ProducerMessage {
+func prepareMessage(topic string, message interface{}) *sarama.ProducerMessage {
 	msg := &sarama.ProducerMessage{
 		Topic:     topic,
 		Partition: -1,
-		Value:     sarama.StringEncoder(message),
+		Value:     sarama.StringEncoder(message.(string)),
 	}
 
 	return msg

@@ -7,22 +7,32 @@ import (
 	kafka "kernel-concierge/Kafka"
 	pending "kernel-concierge/Pending"
 	"log"
-	"math/rand"
 	"net/http"
+	"strings"
 	"time"
-)
 
-// IncomingTransaction ...
-type IncomingTransaction struct {
-	Message string `json:"message"`
-}
+	"github.com/satori/go.uuid"
+)
 
 // ResponseMessage ...
 type ResponseMessage struct {
 	Msg string `json:"message"`
 }
 
-const letterBytes = "ab"
+// RequestData ...
+type RequestData struct {
+	IDRequest    string `json:"idRequest"`
+	JaggerParams string `json:"jagerParams"`
+	// Accounts     struct {
+	// 	AccountsOperations []struct {
+	// 		ID    string `json:"id"`
+	// 		Value int    `json:"value"`
+	// 	} `json:"accountsOperations"`
+	// }
+	AccountsOperations string
+}
+
+// const letterBytes = "ab"
 
 var rm ResponseMessage
 
@@ -32,27 +42,30 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	rm = ResponseMessage{}
 
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 
 	// rest boilerplate
-	it := IncomingTransaction{}
+	rd := RequestData{}
 	req, _ := ioutil.ReadAll(r.Body)
-	err := json.Unmarshal([]byte(req), &it)
 
-	if err != nil {
-		log.Println(debuggin.Tracer(), "invalid transaction")
-		rm.Msg = "Invalid transaction format"
-		w.WriteHeader(http.StatusBadRequest)
-		resp, _ := json.Marshal(rm)
-		w.Write(resp)
-		return
-	}
+	rd.AccountsOperations = strings.TrimSpace(string(req))
+	rd.IDRequest = uuid.Must(uuid.NewV4()).String()
+
+	// if err != nil {
+	// 	log.Println(debuggin.Tracer(), "invalid account operations", err)
+	// 	rm.Msg = "Invalid account operations format"
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	resp, _ := json.Marshal(rm)
+	// 	w.Write(resp)
+	// 	return
+	// }
 
 	// creates pending request to add do the stream pending map
 	pr := pending.Request{}
-	pr.RequestID = string(letterBytes[rand.Intn(len(letterBytes))])
+	// pr.RequestID = string(letterBytes[rand.Intn(len(letterBytes))])
+	pr.RequestID = rd.IDRequest
 	pr.ResponseChan = make(chan string)
-	pr.RequestData = it.Message
+	pr.RequestData = rd.AccountsOperations
 	// defers closing the channel and any other resource opened
 	defer closeResources(pr)
 
