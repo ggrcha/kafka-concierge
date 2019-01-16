@@ -29,9 +29,12 @@ func getConsumer() *consumergroup.ConsumerGroup {
 		config.Offsets.ProcessingTimeout = 10 * time.Second
 
 		// join to consumer group
-		cg, err = consumergroup.JoinConsumerGroup(cgroup, []string{rpTopic}, []string{zookeeperConn}, config)
-		if err != nil {
-			panic(err)
+		for {
+			cg, err = consumergroup.JoinConsumerGroup(cgroup, []string{rpTopic}, []string{zookeeperConn}, config)
+			if err == nil {
+				break
+			}
+			time.Sleep(5 * time.Second)
 		}
 	})
 
@@ -46,6 +49,7 @@ func newProducer() (sarama.SyncProducer, error) {
 	config.Net.SASL.Enable = false
 	config.Net.SASL.Handshake = false
 	config.Net.TLS.Enable = false
+	config.Version = sarama.V2_0_0_0
 	producer, err := sarama.NewSyncProducer([]string{broker}, config)
 
 	return producer, err
