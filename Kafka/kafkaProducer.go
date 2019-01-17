@@ -4,12 +4,17 @@ import (
 	"kernel-concierge/Debuggin"
 	"kernel-concierge/Pending"
 	"log"
+	"os"
 
 	"gopkg.in/Shopify/sarama.v1"
 )
 
+var hostname string
+
 // ProduceRequest starts the process of a new transaction
 func ProduceRequest(request pending.Request) {
+
+	hostname, _ = os.Hostname()
 
 	producer := getProducer()
 
@@ -30,6 +35,7 @@ func prepareMessage(topic string, message interface{}) *sarama.ProducerMessage {
 		Topic:     topic,
 		Partition: -1,
 		Value:     sarama.StringEncoder(message.(string)),
+		Key:       sarama.StringEncoder(hostname),
 	}
 
 	return msg

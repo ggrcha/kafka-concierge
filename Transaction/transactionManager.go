@@ -15,14 +15,17 @@ import (
 
 // RequestData ...
 type RequestData struct {
-	IDRequest    string `json:"idRequest"`
-	JaggerParams string `json:"jagerParams"`
-	Accounts     struct {
-		AccountsOperations []struct {
-			ID    string `json:"id"`
-			Value int    `json:"value"`
-		} `json:"accountsOperations"`
-	} `json:"accounts"`
+	IDRequest         string      `json:"idRequest"`
+	JaggerParams      interface{} `json:"jagerParams"`
+	AccountOperations interface{} `json:"accountOperations"`
+}
+
+//Ao ...
+type Ao struct {
+	AccountOperations []struct {
+		ID    string `json:"id"`
+		Value int    `json:"value"`
+	} `json:"accountOperations"`
 }
 
 // ResponseData ...
@@ -40,11 +43,20 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 	// rest boilerplate
 	req, _ := ioutil.ReadAll(r.Body)
 
+	// --------------------------------------
+
+	// PROVISORIO: somente para o Ricko aceitar os requests
+	jprms := `{"uber-trace-id":"a817daac97187a30:a817daac97187a30:0:1"}`
+
+	// --------------------------------------
+
+	ao := Ao{}
+	_ = json.Unmarshal(req, &ao)
 	// creates request that will be send to kafka pipeline
 	rd := RequestData{}
-	_ = json.Unmarshal(req, &rd.Accounts)
+	rd.AccountOperations = ao.AccountOperations
 	rd.IDRequest = uuid.Must(uuid.NewV4()).String()
-	rd.JaggerParams = ""
+	_ = json.Unmarshal([]byte(jprms), &rd.JaggerParams)
 
 	// converts to json
 	jsonRequest, _ := json.Marshal(rd)
