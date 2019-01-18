@@ -5,17 +5,13 @@ import (
 	debuggin "kernel-concierge/Debuggin"
 	pending "kernel-concierge/Pending"
 	"log"
-	"math/rand"
 	"os"
-	"time"
 )
 
 // ConsumeKafkaResponses ...
 func ConsumeKafkaResponses() {
 
-	cg := getConsumer()
-
-	rand.Seed(time.Now().UnixNano())
+	cg = getConsumer()
 
 	for {
 

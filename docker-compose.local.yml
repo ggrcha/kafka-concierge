@@ -1,0 +1,51 @@
+version: '3.2'
+
+services:
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+
+  kafka:
+    image: wurstmeister/kafka:2.11-2.0.0
+    # deploy:
+    #   mode: replicated
+    #   replicas: 1
+    links:
+      - zookeeper:zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://kafka:9094
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+ 
+  kernel-concierge:
+    image: ggrcha/kernel-concierge
+    build: .
+    ports:
+      - 8000:8000
+    environment: 
+      ZK_HOST: zookeeper:2181
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
+      RQ_TOPIC: bb_ricko_planbuilder
+      RP_TOPIC: bb_ricko_responder_
+
+
+# networks:
+#   default:
+#     external:
+#       name: traefik-net
+
+###########################################################################################
+# Network para funfar local em linux sem detonar sua rede.
+###########################################################################################
+networks:
+ default:
+   ipam:
+     driver: default
+     config:
+       - subnet: 192.168.5.0/24
+
+
+

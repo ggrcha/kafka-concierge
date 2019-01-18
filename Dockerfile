@@ -8,7 +8,7 @@ ADD . /go/src/kernel-concierge/
 RUN go get -d -v
 # compile code
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o main .
-FROM scratch
+FROM alpine
 COPY --from=builder /go/src/kernel-concierge/ /app/
 WORKDIR /app
-CMD ["./main"]
+CMD ["sh","checkIsUp.sh"]

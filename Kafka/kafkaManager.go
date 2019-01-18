@@ -3,6 +3,7 @@ package kafka
 import (
 	debuggin "kernel-concierge/Debuggin"
 	"log"
+	"os"
 	"time"
 
 	"github.com/wvanbergen/kafka/consumergroup"
@@ -28,20 +29,26 @@ func getConsumer() *consumergroup.ConsumerGroup {
 		config.Offsets.Initial = sarama.OffsetOldest
 		config.Offsets.ProcessingTimeout = 10 * time.Second
 
+		hostname, _ := os.Hostname()
+		localRpTopic := rpTopic + hostname
+
 		// join to consumer group
-		for {
-			cg, err = consumergroup.JoinConsumerGroup(cgroup, []string{rpTopic}, []string{zookeeperConn}, config)
-			if err == nil {
-				break
-			}
-			time.Sleep(5 * time.Second)
+		log.Println("localRpTopic: ", localRpTopic)
+		cg, err = consumergroup.JoinConsumerGroup(cgroup, []string{localRpTopic}, []string{zookeeperConn}, config)
+		if err != nil {
+			log.Println(debuggin.Tracer(), "Could not create producer: ", err)
+			panic(err)
 		}
+
 	})
 
 	return cg
 }
 
 func newProducer() (sarama.SyncProducer, error) {
+
+	kafkaBroker := broker + ":" + port
+
 	config := sarama.NewConfig()
 	config.Producer.Partitioner = sarama.NewRandomPartitioner
 	config.Producer.RequiredAcks = sarama.WaitForAll
@@ -50,7 +57,7 @@ func newProducer() (sarama.SyncProducer, error) {
 	config.Net.SASL.Handshake = false
 	config.Net.TLS.Enable = false
 	config.Version = sarama.V2_0_0_0
-	producer, err := sarama.NewSyncProducer([]string{broker}, config)
+	producer, err := sarama.NewSyncProducer([]string{kafkaBroker}, config)
 
 	return producer, err
 }

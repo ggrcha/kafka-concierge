@@ -23,6 +23,7 @@ var (
 	Cancel        chan bool
 	zookeeperConn = os.Getenv("ZK_HOST")
 	broker        = os.Getenv("KAFKA_HOST")
+	port          = os.Getenv("KAFKA_PORT")
 	reqTopic      = os.Getenv("RQ_TOPIC")
 	rpTopic       = os.Getenv("RP_TOPIC")
 )

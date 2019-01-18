@@ -16,7 +16,7 @@ import (
 // RequestData ...
 type RequestData struct {
 	IDRequest         string      `json:"idRequest"`
-	JaggerParams      interface{} `json:"jagerParams"`
+	JaggerParams      interface{} `json:"jaegerParams"`
 	AccountOperations interface{} `json:"accountOperations"`
 }
 
@@ -35,6 +35,11 @@ type ResponseData struct {
 	ResponseTopic  string `json:"responseTopic"`
 }
 
+// JP ...
+type JP struct {
+	UberTraceID interface{} `json:"uber-trace-id"`
+}
+
 // Manager manages request to kafka
 func Manager(w http.ResponseWriter, r *http.Request) {
 
@@ -46,7 +51,17 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 	// --------------------------------------
 
 	// PROVISORIO: somente para o Ricko aceitar os requests
-	jprms := `{"uber-trace-id":"a817daac97187a30:a817daac97187a30:0:1"}`
+	// tracer, closer := jager.InitJager("hello-world")
+	// defer closer.Close()
+
+	// span := tracer.StartSpan("say-hello")
+	// log.Println("ctx: ", span.Context())
+
+	jp := JP{}
+	jp.UberTraceID = "2648669eebc21e7a:2648669eebc21e7a:0:1"
+	// jp.UberTraceID = fmt.Sprint(span)
+
+	// defer span.Finish()
 
 	// --------------------------------------
 
@@ -56,7 +71,8 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 	rd := RequestData{}
 	rd.AccountOperations = ao.AccountOperations
 	rd.IDRequest = uuid.Must(uuid.NewV4()).String()
-	_ = json.Unmarshal([]byte(jprms), &rd.JaggerParams)
+	jParms, _ := json.Marshal(jp)
+	_ = json.Unmarshal(jParms, &rd.JaggerParams)
 
 	// converts to json
 	jsonRequest, _ := json.Marshal(rd)
@@ -75,7 +91,7 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 
 	// blocks execution until response or timeout
 	select {
-	case <-time.After(3 * time.Second):
+	case <-time.After(10 * time.Second):
 		log.Println(debuggin.Tracer(), "timeout received")
 		// Notifies timeout
 		kafka.ToChan <- pr
