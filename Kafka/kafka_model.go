@@ -5,7 +5,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/wvanbergen/kafka/consumergroup"
 	"gopkg.in/Shopify/sarama.v1"
 )
 
@@ -14,7 +13,7 @@ var (
 	onceP         sync.Once
 	onceCg        sync.Once
 	err           error
-	cg            *consumergroup.ConsumerGroup
+	// cg            *consumergroup.ConsumerGroup
 	// ToChan timeout channel
 	ToChan chan pending.Request
 	// NewRequest new request channel

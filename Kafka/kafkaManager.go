@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/bsm/sarama-cluster"
 	"github.com/wvanbergen/kafka/consumergroup"
 	"gopkg.in/Shopify/sarama.v1"
 )
@@ -21,28 +22,25 @@ func getProducer() sarama.SyncProducer {
 	return kafkaProducer
 }
 
-func getConsumer() *consumergroup.ConsumerGroup {
+// func getConsumer() *consumergroup.ConsumerGroup {
+func getConsumer() *cluster.Consumer {
+	// onceCg.Do(func() {
+	// consumer config
 
-	onceCg.Do(func() {
-		// consumer config
-		config := consumergroup.NewConfig()
-		config.Offsets.Initial = sarama.OffsetOldest
-		config.Offsets.ProcessingTimeout = 10 * time.Second
+	kafkaBroker := broker + ":" + port
 
-		hostname, _ := os.Hostname()
-		localRpTopic := rpTopic + hostname
+	config := consumergroup.NewConfig()
+	config.Offsets.Initial = sarama.OffsetOldest
+	config.Offsets.ProcessingTimeout = 10 * time.Second
 
-		// join to consumer group
-		log.Println("localRpTopic: ", localRpTopic)
-		cg, err = consumergroup.JoinConsumerGroup(cgroup, []string{localRpTopic}, []string{zookeeperConn}, config)
-		if err != nil {
-			log.Println(debuggin.Tracer(), "Could not create producer: ", err)
-			panic(err)
-		}
+	conf := cluster.NewConfig()
 
-	})
+	hostname, _ := os.Hostname()
+	localRpTopic := rpTopic + hostname
 
-	return cg
+	consumer, _ := cluster.NewConsumer([]string{kafkaBroker}, cgroup, []string{localRpTopic}, conf)
+
+	return consumer
 }
 
 func newProducer() (sarama.SyncProducer, error) {
@@ -65,5 +63,5 @@ func newProducer() (sarama.SyncProducer, error) {
 // CloseResources closes all resources
 func closeResources() {
 	kafkaProducer.Close()
-	cg.Close()
+	// cg.Close()
 }

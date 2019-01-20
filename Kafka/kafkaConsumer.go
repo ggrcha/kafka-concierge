@@ -11,7 +11,7 @@ import (
 // ConsumeKafkaResponses ...
 func ConsumeKafkaResponses() {
 
-	cg = getConsumer()
+	cg := getConsumer()
 
 	for {
 
