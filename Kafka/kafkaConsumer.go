@@ -11,7 +11,7 @@ import (
 // ConsumeKafkaResponses ...
 func ConsumeKafkaResponses() {
 
-	cg := getConsumer()
+	getConsumer()
 
 	for {
 
@@ -36,6 +36,7 @@ func ConsumeKafkaResponses() {
 				rc <- rv
 				close(rc)
 			}
+			cg.MarkOffset(msg, "")
 		case pr := <-ToChan:
 			pr.Remove()
 			close(pr.ResponseChan)

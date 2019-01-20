@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	sar "github.com/Shopify/sarama"
 	"github.com/bsm/sarama-cluster"
 	"github.com/wvanbergen/kafka/consumergroup"
 	"gopkg.in/Shopify/sarama.v1"
@@ -22,25 +23,22 @@ func getProducer() sarama.SyncProducer {
 	return kafkaProducer
 }
 
-// func getConsumer() *consumergroup.ConsumerGroup {
-func getConsumer() *cluster.Consumer {
-	// onceCg.Do(func() {
-	// consumer config
+func getConsumer() {
 
 	kafkaBroker := broker + ":" + port
 
 	config := consumergroup.NewConfig()
-	config.Offsets.Initial = sarama.OffsetOldest
+	config.Offsets.Initial = sarama.OffsetNewest
 	config.Offsets.ProcessingTimeout = 10 * time.Second
+	config.Version = sar.V2_0_0_0
 
 	conf := cluster.NewConfig()
 
 	hostname, _ := os.Hostname()
 	localRpTopic := rpTopic + hostname
 
-	consumer, _ := cluster.NewConsumer([]string{kafkaBroker}, cgroup, []string{localRpTopic}, conf)
+	cg, _ = cluster.NewConsumer([]string{kafkaBroker}, cgroup, []string{localRpTopic}, conf)
 
-	return consumer
 }
 
 func newProducer() (sarama.SyncProducer, error) {
@@ -63,5 +61,5 @@ func newProducer() (sarama.SyncProducer, error) {
 // CloseResources closes all resources
 func closeResources() {
 	kafkaProducer.Close()
-	// cg.Close()
+	cg.Close()
 }

@@ -5,6 +5,7 @@ import (
 	"os"
 	"sync"
 
+	cluster "github.com/bsm/sarama-cluster"
 	"gopkg.in/Shopify/sarama.v1"
 )
 
@@ -13,7 +14,7 @@ var (
 	onceP         sync.Once
 	onceCg        sync.Once
 	err           error
-	// cg            *consumergroup.ConsumerGroup
+	cg            *cluster.Consumer
 	// ToChan timeout channel
 	ToChan chan pending.Request
 	// NewRequest new request channel
@@ -28,5 +29,5 @@ var (
 )
 
 const (
-	cgroup = "kernel-concierge"
+	cgroup = "consumer-ricko-response"
 )
