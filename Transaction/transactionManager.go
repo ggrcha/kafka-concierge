@@ -80,7 +80,7 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 	// creates pending request to add do the stream pending map
 	pr := pending.Request{}
 	pr.RequestID = rd.IDRequest
-	pr.ResponseChan = make(chan string)
+	pr.ResponseChan = make(chan map[string]interface{})
 	pr.RequestData = string(jsonRequest)
 
 	// adds newly created request to control map
@@ -106,6 +106,10 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 		// returns response to client
 		log.Println(debuggin.Tracer(), "received response from kafka consumer")
 		w.WriteHeader(http.StatusOK)
+		// rd := ResponseData{}
+		// rd.IDTransaction = rp["idTransaction"].(string)
+		// rd.ResponseStatus = rp["status"].(string)
+		// rd.ResponseTopic = rp["responseTopic"].(string)
 		resp, _ := json.Marshal(rp)
 		w.Write(resp)
 	}

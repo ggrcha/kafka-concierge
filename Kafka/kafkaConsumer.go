@@ -20,19 +20,20 @@ func ConsumeKafkaResponses() {
 		// blocks execution until some timeout, arrival of new request or new message
 		select {
 		case msg := <-cg.Messages():
-			log.Println(debuggin.Tracer(), "received message: ", string(msg.Value))
+			log.Println(debuggin.Tracer(), "received message: ", string(msg.Key), string(msg.Value))
 			// retrieves idRequest from kafka response
 			var rv map[string]interface{}
 			if err := json.Unmarshal(msg.Value, &rv); err != nil {
 				panic(err)
 			}
-			requestID := rv["idRequest"].(string)
+			// requestID := rv["idRequest"].(string)
+			requestID := string(msg.Key)
 			rp := pending.Request{RequestID: requestID}
 			// gets response channel to send response
 			rc, exists := rp.GetByID()
 			if exists {
 				rp.Remove()
-				rc <- string(msg.Value)
+				rc <- rv
 				close(rc)
 			}
 		case pr := <-ToChan:

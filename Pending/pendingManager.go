@@ -1,12 +1,12 @@
 package pending
 
 // StreamPendingRequests keeps all requests pending response
-var streamPendingRequests map[string]chan string
+var streamPendingRequests map[string]chan map[string]interface{}
 
 // Request ...
 type Request struct {
 	RequestID    string
-	ResponseChan chan string
+	ResponseChan chan map[string]interface{}
 	RequestData  string
 }
 
@@ -15,7 +15,7 @@ func (pr Request) Add() {
 
 	// if no map avaiable, creates one
 	if streamPendingRequests == nil {
-		setStreamPendingRequests(make(map[string]chan string))
+		setStreamPendingRequests(make(map[string]chan map[string]interface{}))
 	}
 
 	streamPendingRequests[pr.RequestID] = pr.ResponseChan
@@ -27,12 +27,12 @@ func (pr Request) Remove() {
 }
 
 // GetByID ...
-func (pr Request) GetByID() (chan string, bool) {
+func (pr Request) GetByID() (chan map[string]interface{}, bool) {
 	r, exists := streamPendingRequests[pr.RequestID]
 	return r, exists
 }
 
 // SetStreamPendingRequests ...
-func setStreamPendingRequests(spr map[string]chan string) {
+func setStreamPendingRequests(spr map[string]chan map[string]interface{}) {
 	streamPendingRequests = spr
 }
