@@ -28,8 +28,21 @@ services:
       ZK_HOST: zookeeper:2181
       KAFKA_HOST: kafka
       KAFKA_PORT: 9092
-      RQ_TOPIC: bb_ricko_planbuilder
-      RP_TOPIC: bb_ricko_responder_
+      RQ_TOPIC: teste_rq
+      RP_TOPIC: teste_rp
+
+  consumer:
+    image: ggrcha/sarama-consumer
+    links:
+      - zookeeper:zookeeper
+      - kafka:kafka
+    environment: 
+      ZK_HOST: zookeeper:2181
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
+      RQ_TOPIC: teste_rq
+      RP_TOPIC: teste_rp
+
 
 
 # networks:

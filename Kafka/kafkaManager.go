@@ -4,11 +4,9 @@ import (
 	debuggin "kernel-concierge/Debuggin"
 	"log"
 	"os"
-	"time"
 
 	sar "github.com/Shopify/sarama"
 	"github.com/bsm/sarama-cluster"
-	"github.com/wvanbergen/kafka/consumergroup"
 	"gopkg.in/Shopify/sarama.v1"
 )
 
@@ -23,22 +21,42 @@ func getProducer() sarama.SyncProducer {
 	return kafkaProducer
 }
 
-func getConsumer() {
+func initConsumerGroup() {
 
 	kafkaBroker := broker + ":" + port
+	hostname, _ := os.Hostname()
+	localRpTopic := rpTopic + hostname
+	// localRpTopic := rpTopic
 
-	config := consumergroup.NewConfig()
-	config.Offsets.Initial = sarama.OffsetNewest
-	config.Offsets.ProcessingTimeout = 10 * time.Second
+	// config := consumergroup.NewConfig()
+	config := cluster.NewConfig()
+	config.Consumer.Offsets.Initial = sarama.OffsetNewest
+	// config.Consumer.Offsets.ProcessingTimeout = 10 * time.Second
 	config.Version = sar.V2_0_0_0
+	config.Consumer.Fetch.Max = 5120
+	config.Consumer.Fetch.Default = 5120
+	config.Consumer.Fetch.Min = 5120
 
-	conf := cluster.NewConfig()
+	cg, _ = cluster.NewConsumer([]string{kafkaBroker}, cgroup, []string{localRpTopic}, config)
 
+}
+
+func initConsumer() sarama.PartitionConsumer {
+
+	kafkaBroker := broker + ":" + port
 	hostname, _ := os.Hostname()
 	localRpTopic := rpTopic + hostname
 
-	cg, _ = cluster.NewConsumer([]string{kafkaBroker}, cgroup, []string{localRpTopic}, conf)
+	consumer, err := sarama.NewConsumer([]string{kafkaBroker}, nil)
+	if err != nil {
+		panic(err)
+	}
 
+	partitionConsumer, err := consumer.ConsumePartition(localRpTopic, 0, sarama.OffsetNewest)
+	if err != nil {
+		panic(err)
+	}
+	return partitionConsumer
 }
 
 func newProducer() (sarama.SyncProducer, error) {

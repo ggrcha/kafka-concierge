@@ -11,7 +11,8 @@ import (
 // ConsumeKafkaResponses ...
 func ConsumeKafkaResponses() {
 
-	getConsumer()
+	initConsumerGroup()
+	// partitionConsumer := initConsumer()
 
 	for {
 
@@ -19,14 +20,31 @@ func ConsumeKafkaResponses() {
 
 		// blocks execution until some timeout, arrival of new request or new message
 		select {
+		// case msg := <-partitionConsumer.Messages():
+		// 	log.Println(debuggin.Tracer(), "received message: ", string(msg.Key), string(msg.Value))
+		// 	// retrieves idRequest from kafka response
+		// 	var rv map[string]interface{}
+		// 	if err := json.Unmarshal(msg.Value, &rv); err != nil {
+		// 		panic(err)
+		// 	}
+		// 	// requestID := rv["idRequest"].(string)
+		// 	requestID := string(msg.Key)
+		// 	rp := pending.Request{RequestID: requestID}
+		// 	// gets response channel to send response
+		// 	rc, exists := rp.GetByID()
+		// 	if exists {
+		// 		rp.Remove()
+		// 		rc <- rv
+		// 		close(rc)
+		// 	}
+		// case err := <-partitionConsumer.Errors():
+		// 	log.Println("error received: ", err)
 		case msg := <-cg.Messages():
 			log.Println(debuggin.Tracer(), "received message: ", string(msg.Key), string(msg.Value))
-			// retrieves idRequest from kafka response
 			var rv map[string]interface{}
 			if err := json.Unmarshal(msg.Value, &rv); err != nil {
 				panic(err)
 			}
-			// requestID := rv["idRequest"].(string)
 			requestID := string(msg.Key)
 			rp := pending.Request{RequestID: requestID}
 			// gets response channel to send response
