@@ -12,7 +12,20 @@ import (
 func ConsumeKafkaResponses() {
 
 	initConsumerGroup()
-	// partitionConsumer := initConsumer()
+
+	// consume errors
+	go func() {
+		for err := range cg.Errors() {
+			log.Printf("Error: %s\n", err.Error())
+		}
+	}()
+
+	// consume notifications
+	go func() {
+		for ntf := range cg.Notifications() {
+			log.Printf("Rebalanced: %+v\n", ntf)
+		}
+	}()
 
 	for {
 
@@ -20,25 +33,6 @@ func ConsumeKafkaResponses() {
 
 		// blocks execution until some timeout, arrival of new request or new message
 		select {
-		// case msg := <-partitionConsumer.Messages():
-		// 	log.Println(debuggin.Tracer(), "received message: ", string(msg.Key), string(msg.Value))
-		// 	// retrieves idRequest from kafka response
-		// 	var rv map[string]interface{}
-		// 	if err := json.Unmarshal(msg.Value, &rv); err != nil {
-		// 		panic(err)
-		// 	}
-		// 	// requestID := rv["idRequest"].(string)
-		// 	requestID := string(msg.Key)
-		// 	rp := pending.Request{RequestID: requestID}
-		// 	// gets response channel to send response
-		// 	rc, exists := rp.GetByID()
-		// 	if exists {
-		// 		rp.Remove()
-		// 		rc <- rv
-		// 		close(rc)
-		// 	}
-		// case err := <-partitionConsumer.Errors():
-		// 	log.Println("error received: ", err)
 		case msg := <-cg.Messages():
 			log.Println(debuggin.Tracer(), "received message: ", string(msg.Key), string(msg.Value))
 			var rv map[string]interface{}

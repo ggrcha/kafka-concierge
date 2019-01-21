@@ -26,37 +26,21 @@ func initConsumerGroup() {
 	kafkaBroker := broker + ":" + port
 	hostname, _ := os.Hostname()
 	localRpTopic := rpTopic + hostname
-	// localRpTopic := rpTopic
 
-	// config := consumergroup.NewConfig()
 	config := cluster.NewConfig()
 	config.Consumer.Offsets.Initial = sarama.OffsetNewest
-	// config.Consumer.Offsets.ProcessingTimeout = 10 * time.Second
 	config.Version = sar.V2_0_0_0
-	config.Consumer.Fetch.Max = 5120
-	config.Consumer.Fetch.Default = 5120
-	config.Consumer.Fetch.Min = 5120
+	config.Consumer.Fetch.Max = 5 * 1024
+	config.Consumer.Fetch.Default = 5 * 1024
+	config.Consumer.Fetch.Min = 1
 
-	cg, _ = cluster.NewConsumer([]string{kafkaBroker}, cgroup, []string{localRpTopic}, config)
+	cg, err = cluster.NewConsumer([]string{kafkaBroker}, cgroup, []string{localRpTopic}, config)
 
-}
-
-func initConsumer() sarama.PartitionConsumer {
-
-	kafkaBroker := broker + ":" + port
-	hostname, _ := os.Hostname()
-	localRpTopic := rpTopic + hostname
-
-	consumer, err := sarama.NewConsumer([]string{kafkaBroker}, nil)
 	if err != nil {
+		log.Println(debuggin.Tracer(), err)
 		panic(err)
 	}
 
-	partitionConsumer, err := consumer.ConsumePartition(localRpTopic, 0, sarama.OffsetNewest)
-	if err != nil {
-		panic(err)
-	}
-	return partitionConsumer
 }
 
 func newProducer() (sarama.SyncProducer, error) {
