@@ -27,7 +27,6 @@ func AccountService(w http.ResponseWriter, r *http.Request) {
 	ar.AccountID = uuid.Must(uuid.NewV4()).String()
 	accountRequest, _ := json.Marshal(ar)
 
-	log.Println(debuggin.Tracer(), "accountRequest: ", string(accountRequest))
 	// creates pending request to add do the stream pending map
 	pr := pending.Request{}
 	pr.RequestID = ar.AccountID
