@@ -1,4 +1,4 @@
-package transaction
+package services
 
 import (
 	"encoding/json"
@@ -40,8 +40,8 @@ type JP struct {
 	UberTraceID interface{} `json:"uber-trace-id"`
 }
 
-// Manager manages request to kafka
-func Manager(w http.ResponseWriter, r *http.Request) {
+// TransactionService manages transaction requests to kafka
+func TransactionService(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -106,10 +106,6 @@ func Manager(w http.ResponseWriter, r *http.Request) {
 		// returns response to client
 		log.Println(debuggin.Tracer(), "received response from kafka consumer")
 		w.WriteHeader(http.StatusOK)
-		// rd := ResponseData{}
-		// rd.IDTransaction = rp["idTransaction"].(string)
-		// rd.ResponseStatus = rp["status"].(string)
-		// rd.ResponseTopic = rp["responseTopic"].(string)
 		resp, _ := json.Marshal(rp)
 		w.Write(resp)
 	}
