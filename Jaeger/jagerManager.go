@@ -1,4 +1,4 @@
-package jager
+package jaeger
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 	"github.com/uber/jaeger-client-go/config"
 )
 
-//InitJager ...
-func InitJager(service string) (opentracing.Tracer, io.Closer) {
+//InitJaeger ...
+func InitJaeger(service string) (opentracing.Tracer, io.Closer) {
 
 	cfg := &config.Configuration{
 		Sampler: &config.SamplerConfig{

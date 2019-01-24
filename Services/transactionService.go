@@ -16,7 +16,7 @@ import (
 // RequestData ...
 type RequestData struct {
 	IDRequest         string      `json:"idRequest"`
-	JaggerParams      interface{} `json:"jaegerParams"`
+	JaegerParams      interface{} `json:"jaegerParams"`
 	AccountOperations interface{} `json:"accountOperations"`
 }
 
@@ -51,7 +51,7 @@ func TransactionService(w http.ResponseWriter, r *http.Request) {
 	// --------------------------------------
 
 	// PROVISORIO: somente para o Ricko aceitar os requests
-	// tracer, closer := jager.InitJager("hello-world")
+	// tracer, closer := jaeger.InitJaeger("hello-world")
 	// defer closer.Close()
 
 	// span := tracer.StartSpan("say-hello")
@@ -72,7 +72,7 @@ func TransactionService(w http.ResponseWriter, r *http.Request) {
 	rd.AccountOperations = ao.AccountOperations
 	rd.IDRequest = uuid.Must(uuid.NewV4()).String()
 	jParms, _ := json.Marshal(jp)
-	_ = json.Unmarshal(jParms, &rd.JaggerParams)
+	_ = json.Unmarshal(jParms, &rd.JaegerParams)
 
 	// converts to json
 	jsonRequest, _ := json.Marshal(rd)
