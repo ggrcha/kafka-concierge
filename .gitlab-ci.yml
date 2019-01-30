@@ -17,7 +17,6 @@ build:
     # - echo "Build on Master $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION and $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION"
     - echo "Build on Master $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION"
     - >
-      # docker build -t $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION -t $REGISTRY/$GROUP_NAME/$IMAGE_NAME:latest -t $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION -t $NEXUS/$GROUP_NAME/$IMAGE_NAME:latest
       docker build -t $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION -t $REGISTRY/$GROUP_NAME/$IMAGE_NAME:latest
       --label "org.opencontainers.image.created=$(date +%Y-%m-%dT%T%z | sed -e 's/\([-+][0-9][0-9]\)\([0-9][0-9]\)$/\1\:\2/g')"
       --label "org.opencontainers.image.authors=${GITLAB_USER_NAME} <${GITLAB_USER_EMAIL}>"
