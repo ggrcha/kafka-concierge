@@ -15,7 +15,7 @@ build:
   script:
     # - docker login $NEXUS -u $NEXUS_USER -p $NEXUS_PASSWORD
     # - echo "Build on Master $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION and $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION"
-    - echo "Build on Master $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION
+    - echo "Build on Master $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION"
     - >
       # docker build -t $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION -t $REGISTRY/$GROUP_NAME/$IMAGE_NAME:latest -t $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION -t $NEXUS/$GROUP_NAME/$IMAGE_NAME:latest
       docker build -t $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION -t $REGISTRY/$GROUP_NAME/$IMAGE_NAME:latest
