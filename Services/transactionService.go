@@ -28,8 +28,8 @@ type Ao struct {
 	} `json:"accountOperations"`
 }
 
-// ResponseData ...
-type ResponseData struct {
+// TSResponseData ...
+type TSResponseData struct {
 	ResponseStatus string `json:"status"`
 	IDTransaction  string `json:"idTransaction"`
 	ResponseTopic  string `json:"responseTopic"`
@@ -95,7 +95,7 @@ func TransactionService(w http.ResponseWriter, r *http.Request) {
 		log.Println(debuggin.Tracer(), "timeout received")
 		// Notifies timeout
 		kafka.ToChan <- pr
-		rd := ResponseData{}
+		rd := TSResponseData{}
 		rd.IDTransaction = pr.RequestID
 		rd.ResponseStatus = "INTERNAL_ERROR"
 		rd.ResponseTopic = ""

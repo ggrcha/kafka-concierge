@@ -12,9 +12,16 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// AccountRequest ...
-type AccountRequest struct {
-	AccountID string `json:"accountId"`
+// ASResponseData ...
+type ASResponseData struct {
+	ResponseStatus string `json:"status"`
+	AccountID      string `json:"accountId"`
+	ResponseTopic  string `json:"responseTopic"`
+}
+
+// RequestAccount ...
+type RequestAccount struct {
+	RequestID string `json:"requestId"`
 }
 
 //AccountService manages new accounts requests
@@ -23,15 +30,15 @@ func AccountService(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// creates request that will be send to kafka pipeline
-	ar := AccountRequest{}
-	ar.AccountID = uuid.Must(uuid.NewV4()).String()
-	accountRequest, _ := json.Marshal(ar)
+	ra := RequestAccount{}
+	ra.RequestID = uuid.Must(uuid.NewV4()).String()
+	requestAccount, _ := json.Marshal(ra)
 
 	// creates pending request to add do the stream pending map
 	pr := pending.Request{}
-	pr.RequestID = ar.AccountID
+	pr.RequestID = ra.RequestID
 	pr.ResponseChan = make(chan map[string]interface{})
-	pr.RequestData = string(accountRequest)
+	pr.RequestData = string(requestAccount)
 
 	// adds newly created request to control map
 	kafka.NewRequest <- pr
@@ -45,8 +52,8 @@ func AccountService(w http.ResponseWriter, r *http.Request) {
 		log.Println(debuggin.Tracer(), "timeout received")
 		// Notifies timeout
 		kafka.ToChan <- pr
-		rd := ResponseData{}
-		rd.IDTransaction = pr.RequestID
+		rd := ASResponseData{}
+		rd.AccountID = ""
 		rd.ResponseStatus = "INTERNAL_ERROR"
 		rd.ResponseTopic = ""
 		resp, _ := json.Marshal(rd)
