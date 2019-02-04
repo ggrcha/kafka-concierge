@@ -1,14 +1,23 @@
 stages:
 - build
+- deploy
 
 variables:
   GROUP_NAME: kernel2
-  IMAGE_NAME: concierge
+  IMAGE_NAME: kernel-concierge
   VERSION: $CI_BUILD_REF
   REGISTRY: registry.io.bb.com.br:3389
   NEXUS: apps-atf.io.bb.com.br
   SEMANTIC_VERSION_SRV: api-semver.gtw.dev.io.bb.com.br
-  AMBIENT: canary
+  AMBIENT: development
+  PROJECT_NAME: kernel-concierge-dev
+  PROJECT_ID: 571
+  SOURCE_BRANCH: deploy
+  TARGET_BRANCH: master
+  TITULO_MR: 'Execucao de RUN em kernel-concierge-dev'
+  PASSWORD: 95MsdjdYz4wFcdpZ7oxe
+  PASSWORD_JENKINS: Yb6CTmayBwFyjkrQssVG
+
 
 build:
   stage: build
@@ -37,30 +46,42 @@ build:
   tags:
     - runner-kernel
 
-# build_2:
-#   stage: build
-#   script:
-#     - docker login $NEXUS -u $NEXUS_USER -p $NEXUS_PASSWORD
-#     - apk add --no-cache curl
-#     - echo "VERSION:$(curl -L -k $SEMANTIC_VERSION_SRV/project/$IMAGE_NAME/branch/$AMBIENT/version/codebase)"
-#     - export VERSION_TAG=$(curl -L -k $SEMANTIC_VERSION_SRV/project/$IMAGE_NAME/branch/$AMBIENT/version/codebase)
-#     - echo "Build on TAG $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG and $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG"
-#     - >
-#       docker build -t $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG -t $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
-#       --label "org.opencontainers.image.created=$(date +%Y-%m-%dT%T%z | sed -e 's/\([-+][0-9][0-9]\)\([0-9][0-9]\)$/\1\:\2/g')"
-#       --label "org.opencontainers.image.authors=${GITLAB_USER_NAME} <${GITLAB_USER_EMAIL}>"
-#       --label "org.opencontainers.image.url=${CI_PROJECT_URL}"
-#       --label "org.opencontainers.image.source=${CI_PROJECT_URL}.git"
-#       --label "org.opencontainers.image.version=${VERSION_TAG}"
-#       --label "org.opencontainers.image.revision=${CI_COMMIT_SHA}"
-#       --label "org.opencontainers.image.title=${CI_PROJECT_NAME}"
-#       --label "org.opencontainers.image.vendor=Banco do Brasil S/A"
-#       "."
-#     - docker push $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
-#     - docker push $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
-#     - docker rmi $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
-#     - curl -L -k api-semver.gtw.dev.io.bb.com.br/project/promoteProject/$IMAGE_NAME/origin/$AMBIENT/destiny/$AMBIENT
-#   only:
-#     - tags
-#   tags:
-#     - runner-kernel
+build_2:
+  stage: build
+  script:
+    # - docker login $NEXUS -u $NEXUS_USER -p $NEXUS_PASSWORD
+    - apk add --no-cache curl
+    - echo "VERSION:$(curl -L -k $SEMANTIC_VERSION_SRV/project/$IMAGE_NAME/branch/$AMBIENT/version/codebase)"
+    - export VERSION_TAG=$(curl -L -k $SEMANTIC_VERSION_SRV/project/$IMAGE_NAME/branch/$AMBIENT/version/codebase)
+    - echo "Build on TAG $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG and $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG"
+    - >
+      docker build -t $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG -t $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
+      --label "org.opencontainers.image.created=$(date +%Y-%m-%dT%T%z | sed -e 's/\([-+][0-9][0-9]\)\([0-9][0-9]\)$/\1\:\2/g')"
+      --label "org.opencontainers.image.authors=${GITLAB_USER_NAME} <${GITLAB_USER_EMAIL}>"
+      --label "org.opencontainers.image.url=${CI_PROJECT_URL}"
+      --label "org.opencontainers.image.source=${CI_PROJECT_URL}.git"
+      --label "org.opencontainers.image.version=${VERSION_TAG}"
+      --label "org.opencontainers.image.revision=${CI_COMMIT_SHA}"
+      --label "org.opencontainers.image.title=${CI_PROJECT_NAME}"
+      --label "org.opencontainers.image.vendor=Banco do Brasil S/A"
+      "."
+    - docker push $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
+    # - docker push $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
+    - docker rmi $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
+    # - curl -L -k api-semver.gtw.dev.io.bb.com.br/project/promoteProject/$IMAGE_NAME/origin/$AMBIENT/destiny/$AMBIENT
+  only:
+    - tags
+  tags:
+    - runner-kernel
+
+release:
+  stage: deploy
+  image: registry.io.bb.com.br:3389/gateway30/docker-helm-curl-command
+  script:
+    - sh /makeHelmChart.sh
+  only:
+    - tags
+  tags:
+   - runner-kernel
+
+
