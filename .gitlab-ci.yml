@@ -42,7 +42,7 @@ build:
     # - docker rmi $REGISTRY/$GROUP_NAME/$IMAGE_NAME:latest $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION $NEXUS/$GROUP_NAME/$IMAGE_NAME:latest $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION    
     - docker rmi $REGISTRY/$GROUP_NAME/$IMAGE_NAME:latest $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION    
   only:
-    - master
+    - web
   tags:
     - runner-kernel
 
@@ -82,6 +82,6 @@ release:
   only:
     - tags
   tags:
-   - runner-arq3
+   - runner-kernel-kube
 
 
