@@ -82,6 +82,6 @@ release:
   only:
     - tags
   tags:
-   - runner-kernel
+   - runner-arq3
 
 
