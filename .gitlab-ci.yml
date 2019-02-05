@@ -78,9 +78,9 @@ release:
   stage: deploy
   image: registry.io.bb.com.br:3389/gateway30/docker-helm-curl-command
   script:
-    - sh /makeHelmChart.sh
+    - sh /makeHelmChartRelease.sh
   only:
-    - tags
+    - master
   tags:
    - runner-kernel-kube
 
