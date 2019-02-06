@@ -74,6 +74,7 @@ build_2:
   tags:
     - runner-kernel
 
+
 release:
   stage: deploy
   image: registry.io.bb.com.br:3389/gateway30/docker-helm-curl-command
