@@ -42,7 +42,7 @@ build:
     # - docker rmi $REGISTRY/$GROUP_NAME/$IMAGE_NAME:latest $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION $NEXUS/$GROUP_NAME/$IMAGE_NAME:latest $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION    
     - docker rmi $REGISTRY/$GROUP_NAME/$IMAGE_NAME:latest $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION    
   only:
-    - master
+    - web
   tags:
     - runner-kernel
 
@@ -68,7 +68,7 @@ build_2:
     - docker push $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
     # - docker push $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
     - docker rmi $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
-    # - curl -L -k api-semver.gtw.dev.io.bb.com.br/project/promoteProject/$IMAGE_NAME/origin/$AMBIENT/destiny/$AMBIENT
+    - curl -L -k api-semver.gtw.dev.io.bb.com.br/project/promoteProject/$IMAGE_NAME/origin/$AMBIENT/destiny/$AMBIENT
   only:
     - tags
   tags:
@@ -80,7 +80,7 @@ release:
   script:
     - sh /makeHelmChartRelease.sh
   only:
-    - tags
+    - master
   tags:
     - runner-kernel-kube
 
