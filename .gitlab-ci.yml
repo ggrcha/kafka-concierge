@@ -44,7 +44,7 @@ build:
   only:
     - master
   tags:
-    - runner-kernel
+    - runner-kernel-kube
 
 build_2:
   stage: build
@@ -72,7 +72,7 @@ build_2:
   only:
     - tags
   tags:
-    - runner-kernel
+    - runner-kernel-kube
 
 release:
   stage: deploy
