@@ -1,23 +1,48 @@
 package main
 
 import (
-	_ "encoding/json"
-	"fmt"
-	_ "io"
-	_ "log"
-	_ "net/http"
-	_ "os"
-	_ "sync"
-	_ "time"
-
-	_ "github.com/Shopify/sarama"
-	_ "github.com/bsm/sarama-cluster"
-	_ "github.com/satori/go.uuid"
-	_ "github.com/uber/jaeger-client-go"
-	_ "github.com/uber/jaeger-client-go/config"
-	_ "gopkg.in/Shopify/sarama.v1"
+	debuggin "kernel-concierge/Debuggin"
+	handlers "kernel-concierge/Handlers"
+	kafka "kernel-concierge/Kafka"
+	pending "kernel-concierge/Pending"
+	services "kernel-concierge/Services"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
 )
 
 func main() {
-	fmt.Println("This is used for build caching purposes. Should be replaced.")
+
+	// starts channel to receive timeouts and injects them into kafka
+	kafka.ToChan = make(chan pending.Request)
+	kafka.NewRequest = make(chan pending.Request)
+	kafka.Cancel = make(chan bool)
+
+	// Trap SIGINT to trigger a shutdown.
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+
+	go func() {
+		select {
+		case <-signals:
+			signal.Stop(signals)
+			log.Println(debuggin.Tracer(), "exiting gracefully...")
+			kafka.Cancel <- true
+			closeResources()
+		}
+	}()
+
+	// starts routine that gets kafka's responses
+	go kafka.ConsumeKafkaResponses()
+
+	http.Handle("/v0/transaction", handlers.StreamHandler(services.TransactionService))
+	http.Handle("/v0/accounts", handlers.StreamHandler(services.AccountService))
+	http.ListenAndServe(":8000", nil)
+}
+
+func closeResources() {
+	close(kafka.ToChan)
+	close(kafka.NewRequest)
+	close(kafka.Cancel)
 }

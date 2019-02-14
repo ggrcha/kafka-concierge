@@ -27,11 +27,13 @@ type RequestAccount struct {
 //AccountService manages new accounts requests
 func AccountService(w http.ResponseWriter, r *http.Request) {
 
+	var err error
+
 	w.Header().Set("Content-Type", "application/json")
 
 	// creates request that will be send to kafka pipeline
 	ra := RequestAccount{}
-	ra.RequestID = uuid.Must(uuid.NewV4()).String()
+	ra.RequestID = uuid.Must(uuid.NewV4(), err).String()
 	requestAccount, _ := json.Marshal(ra)
 
 	// creates pending request to add do the stream pending map

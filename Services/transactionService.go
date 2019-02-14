@@ -43,6 +43,8 @@ type JP struct {
 // TransactionService manages transaction requests to kafka
 func TransactionService(w http.ResponseWriter, r *http.Request) {
 
+	var err error
+
 	w.Header().Set("Content-Type", "application/json")
 
 	// rest boilerplate
@@ -70,7 +72,7 @@ func TransactionService(w http.ResponseWriter, r *http.Request) {
 	// creates request that will be send to kafka pipeline
 	rd := RequestData{}
 	rd.AccountOperations = ao.AccountOperations
-	rd.IDRequest = uuid.Must(uuid.NewV4()).String()
+	rd.IDRequest = uuid.Must(uuid.NewV4(), err).String()
 	jParms, _ := json.Marshal(jp)
 	_ = json.Unmarshal(jParms, &rd.JaegerParams)
 
