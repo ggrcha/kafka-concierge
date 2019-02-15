@@ -72,7 +72,8 @@ func TransactionService(w http.ResponseWriter, r *http.Request) {
 	// creates request that will be send to kafka pipeline
 	rd := RequestData{}
 	rd.AccountOperations = ao.AccountOperations
-	rd.IDRequest = uuid.Must(uuid.NewV4(), err).String()
+	h, _ := uuid.NewV4()
+	rd.IDRequest = uuid.Must(h, err).String()
 	jParms, _ := json.Marshal(jp)
 	_ = json.Unmarshal(jParms, &rd.JaegerParams)
 
