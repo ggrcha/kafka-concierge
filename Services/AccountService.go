@@ -33,8 +33,8 @@ func AccountService(w http.ResponseWriter, r *http.Request) {
 
 	// creates request that will be send to kafka pipeline
 	ra := RequestAccount{}
-	h, _ := uuid.NewV4()
-	ra.RequestID = uuid.Must(h, err).String()
+	// h, _ := uuid.NewV4()
+	ra.RequestID = uuid.Must(uuid.NewV4(), err).String()
 	requestAccount, _ := json.Marshal(ra)
 
 	// creates pending request to add do the stream pending map
