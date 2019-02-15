@@ -70,7 +70,7 @@ build_2:
     - docker rmi $REGISTRY/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG $NEXUS/$GROUP_NAME/$IMAGE_NAME:$VERSION_TAG
     - curl -L -k api-semver.gtw.dev.io.bb.com.br/project/promoteProject/$IMAGE_NAME/origin/$AMBIENT/destiny/$AMBIENT
   only:
-    - master
+    - tag
   tags:
     - runner-kernel
 
