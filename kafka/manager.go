@@ -1,7 +1,7 @@
 package kafka
 
 import (
-	debuggin "kernel-concierge/Debuggin"
+	debuggin "kernel-concierge/debuggin"
 	"log"
 	"os"
 

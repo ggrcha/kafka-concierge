@@ -1,7 +1,7 @@
 package kafka
 
 import (
-	pending "kernel-concierge/Pending"
+	pending "kernel-concierge/pending"
 	"os"
 	"sync"
 

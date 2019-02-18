@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	debuggin "kernel-concierge/Debuggin"
+	debuggin "kernel-concierge/debuggin"
 	"log"
 	"net/http"
 	"time"

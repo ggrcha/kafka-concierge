@@ -1,11 +1,11 @@
 package main
 
 import (
-	debuggin "kernel-concierge/Debuggin"
-	handlers "kernel-concierge/Handlers"
-	kafka "kernel-concierge/Kafka"
-	pending "kernel-concierge/Pending"
-	services "kernel-concierge/Services"
+	debuggin "kernel-concierge/debuggin"
+	handlers "kernel-concierge/handlers"
+	kafka "kernel-concierge/kafka"
+	pending "kernel-concierge/pending"
+	services "kernel-concierge/services"
 	"log"
 	"net/http"
 	"os"
@@ -36,8 +36,8 @@ func main() {
 	// starts routine that gets kafka's responses
 	go kafka.ConsumeKafkaResponses()
 
-	http.Handle("/v0/transaction", handlers.StreamHandler(services.TransactionService))
-	http.Handle("/v0/accounts", handlers.StreamHandler(services.AccountService))
+	http.Handle("/v0/transaction", handlers.StreamHandler(services.Transaction))
+	http.Handle("/v0/accounts", handlers.StreamHandler(services.Account))
 	http.ListenAndServe(":8000", nil)
 }
 

@@ -2,9 +2,9 @@ package services
 
 import (
 	"encoding/json"
-	debuggin "kernel-concierge/Debuggin"
-	kafka "kernel-concierge/Kafka"
-	pending "kernel-concierge/Pending"
+	debuggin "kernel-concierge/debuggin"
+	kafka "kernel-concierge/kafka"
+	pending "kernel-concierge/pending"
 	"log"
 	"net/http"
 	"time"
@@ -24,8 +24,8 @@ type RequestAccount struct {
 	RequestID string `json:"requestId"`
 }
 
-//AccountService manages new accounts requests
-func AccountService(w http.ResponseWriter, r *http.Request) {
+//Account manages new accounts requests
+func Account(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 

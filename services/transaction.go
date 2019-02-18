@@ -3,9 +3,9 @@ package services
 import (
 	"encoding/json"
 	"io/ioutil"
-	debuggin "kernel-concierge/Debuggin"
-	kafka "kernel-concierge/Kafka"
-	pending "kernel-concierge/Pending"
+	debuggin "kernel-concierge/debuggin"
+	kafka "kernel-concierge/kafka"
+	pending "kernel-concierge/pending"
 	"log"
 	"net/http"
 	"time"
@@ -40,8 +40,8 @@ type JP struct {
 	UberTraceID interface{} `json:"uber-trace-id"`
 }
 
-// TransactionService manages transaction requests to kafka
-func TransactionService(w http.ResponseWriter, r *http.Request) {
+// Transaction manages transaction requests to kafka
+func Transaction(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 

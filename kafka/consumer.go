@@ -2,8 +2,8 @@ package kafka
 
 import (
 	"encoding/json"
-	debuggin "kernel-concierge/Debuggin"
-	pending "kernel-concierge/Pending"
+	debuggin "kernel-concierge/debuggin"
+	pending "kernel-concierge/pending"
 	"log"
 	"os"
 )
