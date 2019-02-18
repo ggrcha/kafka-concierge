@@ -19,4 +19,4 @@ done
 
 sleep 10;
 
-./main
+./kernel-concierge
